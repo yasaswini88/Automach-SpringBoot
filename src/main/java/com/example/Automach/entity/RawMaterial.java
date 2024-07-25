@@ -1,49 +1,47 @@
 package com.example.Automach.entity;
 
-//import java.util.HashSet;
-//import java.util.Set;
-
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class RawMaterial {
-	
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long materialId;
-	
-	private String materialName;
 
-	public Long getMaterialId() {
-		return materialId;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String materialName;
 
-	public void setMaterialId(Long materialId) {
-		this.materialId = materialId;
-	}
+    @OneToMany(mappedBy = "rawMaterial", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductRawMaterial> products = new HashSet<>();
 
-	public String getMaterialName() {
-		return materialName;
-	}
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
 
-	public void setMaterialName(String materialName) {
-		this.materialName = materialName;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	@Override
-	public String toString() {
-		return "RawMaterial [materialId=" + materialId + ", materialName=" + materialName + ", getMaterialId()="
-				+ getMaterialId() + ", getMaterialName()=" + getMaterialName() + ", getClass()=" + getClass()
-				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
-	}
-	
-//	@ManyToMany(mappedBy = "rawMaterials")
-//    private Set<Product> products = new HashSet<>();
+    public String getMaterialName() {
+        return materialName;
+    }
 
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
+    }
 
+    public Set<ProductRawMaterial> getProducts() {
+        return products;
+    }
 
-	
-	
+    public void setProducts(Set<ProductRawMaterial> products) {
+        this.products = products;
+    }
 
+    @Override
+    public String toString() {
+        return "RawMaterial [id=" + id + ", materialName=" + materialName + ", products=" + products + "]";
+    }
 }
