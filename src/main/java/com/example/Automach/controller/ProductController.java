@@ -67,6 +67,17 @@ public class ProductController {
         }
     }
 
+    @DeleteMapping("/api/products/{prodId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long prodId) {
+        Optional<Product> product = prodRepo.findById(prodId);
+        if (product.isPresent()) {
+            prodRepo.delete(product.get());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @Transactional
     public Product addProductWithMaterials(Product product, Map<Long, Integer> rawMaterialQuantities) {
         Set<ProductRawMaterial> materials = new HashSet<>();
@@ -75,13 +86,26 @@ public class ProductController {
             Integer quantity = entry.getValue();
             RawMaterial rawMaterial = rawMaterialRepo.findById(rawMaterialId)
                     .orElseThrow(() -> new RuntimeException("Material not found with id: " + rawMaterialId));
-            ProductRawMaterial productRawMaterial = new ProductRawMaterial();
-            productRawMaterial.setProduct(product);
-            productRawMaterial.setRawMaterial(rawMaterial);
-            productRawMaterial.setRawMaterialQuantity(quantity);
-            materials.add(productRawMaterial);
+            
+            // Check if the ProductRawMaterial already exists
+            Optional<ProductRawMaterial> existingMaterial = product.getRawMaterials().stream()
+                .filter(prm -> prm.getRawMaterial().getId().equals(rawMaterialId))
+                .findFirst();
+
+            if (existingMaterial.isPresent()) {
+                // Update the quantity if it already exists
+                existingMaterial.get().setRawMaterialQuantity(quantity);
+            } else {
+                // Create new ProductRawMaterial if it doesn't exist
+                ProductRawMaterial productRawMaterial = new ProductRawMaterial();
+                productRawMaterial.setProduct(product);
+                productRawMaterial.setRawMaterial(rawMaterial);
+                productRawMaterial.setRawMaterialQuantity(quantity);
+                materials.add(productRawMaterial);
+            }
         }
         product.setRawMaterials(materials);
         return prodRepo.save(product);
     }
+
 }

@@ -24,7 +24,8 @@ public class RawMaterialController {
 
     @GetMapping("/rawmaterials")
     public ResponseEntity<List<RawMaterial>> getRawMaterials() {
-        return new ResponseEntity<>(rawMaterialRepo.findAll(), HttpStatus.OK);
+        List<RawMaterial> rawMaterials = rawMaterialRepo.findAllRawMaterials();
+        return new ResponseEntity<>(rawMaterials, HttpStatus.OK);
     }
 
     @GetMapping("/rawmaterials/{materialId}")

@@ -1,8 +1,7 @@
 package com.example.Automach.entity;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 public class RawMaterial {
@@ -11,9 +10,10 @@ public class RawMaterial {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String materialName;
-
-    @OneToMany(mappedBy = "rawMaterial", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ProductRawMaterial> products = new HashSet<>();
+    
+//    @OneToOne(mappedBy = "rawMaterial", cascade = CascadeType.ALL)
+//    @JsonBackReference
+//    private ProductRawMaterial productRawMaterial;
 
     // Getters and Setters
     public Long getId() {
@@ -32,16 +32,16 @@ public class RawMaterial {
         this.materialName = materialName;
     }
 
-    public Set<ProductRawMaterial> getProducts() {
-        return products;
-    }
+//    public ProductRawMaterial getProductRawMaterial() {
+//        return productRawMaterial;
+//    }
+//
+//    public void setProductRawMaterial(ProductRawMaterial productRawMaterial) {
+//        this.productRawMaterial = productRawMaterial;
+//    }
 
-    public void setProducts(Set<ProductRawMaterial> products) {
-        this.products = products;
-    }
-
-    @Override
-    public String toString() {
-        return "RawMaterial [id=" + id + ", materialName=" + materialName + ", products=" + products + "]";
-    }
+//    @Override
+//    public String toString() {
+//        return "RawMaterial [id=" + id + ", materialName=" + materialName + ", productRawMaterial=" + productRawMaterial + "]";
+//    }
 }

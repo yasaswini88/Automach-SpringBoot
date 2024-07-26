@@ -1,15 +1,21 @@
 package com.example.Automach.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "product_raw_material")
+
+@Table(name = "product_raw_material", uniqueConstraints = {
+	    @UniqueConstraint(columnNames = {"prod_id", "material_id"})
+	})
 public class ProductRawMaterial {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "prod_id")
     private Product product;
