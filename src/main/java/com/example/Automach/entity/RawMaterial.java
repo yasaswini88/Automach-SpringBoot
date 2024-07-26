@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class RawMaterial {
 
@@ -11,9 +14,11 @@ public class RawMaterial {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String materialName;
-
-    @OneToMany(mappedBy = "rawMaterial", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ProductRawMaterial> products = new HashSet<>();
+    
+    
+//    @JsonBackReference
+//    @OneToMany(mappedBy = "rawMaterial", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
+//    private Set<ProductRawMaterial> products = new HashSet<>();
 
     // Getters and Setters
     public Long getId() {
@@ -32,16 +37,16 @@ public class RawMaterial {
         this.materialName = materialName;
     }
 
-    public Set<ProductRawMaterial> getProducts() {
-        return products;
-    }
-
-    public void setProducts(Set<ProductRawMaterial> products) {
-        this.products = products;
-    }
+//    public Set<ProductRawMaterial> getProducts() {
+//        return products;
+//    }
+//
+//    public void setProducts(Set<ProductRawMaterial> products) {
+//        this.products = products;
+//    }
 
     @Override
     public String toString() {
-        return "RawMaterial [id=" + id + ", materialName=" + materialName + ", products=" + products + "]";
+        return "RawMaterial [id=" + id + ", materialName=" + materialName + ", products=";
     }
 }
