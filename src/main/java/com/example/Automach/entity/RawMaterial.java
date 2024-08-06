@@ -14,16 +14,6 @@ public class RawMaterial {
     private Long id;
     private String materialName;
     
-<<<<<<< HEAD
-//    @OneToOne(mappedBy = "rawMaterial", cascade = CascadeType.ALL)
-//    @JsonBackReference
-//    private ProductRawMaterial productRawMaterial;
-=======
-    
-//    @JsonBackReference
-//    @OneToMany(mappedBy = "rawMaterial", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
-//    private Set<ProductRawMaterial> products = new HashSet<>();
->>>>>>> d4e4a93d12173cff07db2143231dac31cf041e16
 
     // Getters and Setters
     public Long getId() {
@@ -42,31 +32,11 @@ public class RawMaterial {
         this.materialName = materialName;
     }
 
-<<<<<<< HEAD
-//    public ProductRawMaterial getProductRawMaterial() {
-//        return productRawMaterial;
-//    }
-//
-//    public void setProductRawMaterial(ProductRawMaterial productRawMaterial) {
-//        this.productRawMaterial = productRawMaterial;
-//    }
 
-//    @Override
-//    public String toString() {
-//        return "RawMaterial [id=" + id + ", materialName=" + materialName + ", productRawMaterial=" + productRawMaterial + "]";
-//    }
-=======
-//    public Set<ProductRawMaterial> getProducts() {
-//        return products;
-//    }
-//
-//    public void setProducts(Set<ProductRawMaterial> products) {
-//        this.products = products;
-//    }
 
     @Override
     public String toString() {
         return "RawMaterial [id=" + id + ", materialName=" + materialName + ", products=";
     }
->>>>>>> d4e4a93d12173cff07db2143231dac31cf041e16
+
 }

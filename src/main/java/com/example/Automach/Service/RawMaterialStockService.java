@@ -5,6 +5,8 @@ import com.example.Automach.repo.RawMaterialStockRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,10 +29,11 @@ public class RawMaterialStockService {
     }
 
     public RawMaterialStock updateRawMaterialStock(Long id, RawMaterialStock rawMaterialStockDetails) {
-        RawMaterialStock rawMaterialStock = rawMaterialStockRepo.findById(id).orElseThrow(() -> new RuntimeException("RawMaterialStock not found"));
+        RawMaterialStock rawMaterialStock = rawMaterialStockRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("RawMaterialStock not found"));
         rawMaterialStock.setRawMaterial(rawMaterialStockDetails.getRawMaterial());
         rawMaterialStock.setQuantity(rawMaterialStockDetails.getQuantity());
-        rawMaterialStock.setDateModified(rawMaterialStockDetails.getDateModified());
+        rawMaterialStock.setDateModified(Timestamp.from(Instant.now()));
         rawMaterialStock.setModifiedBy(rawMaterialStockDetails.getModifiedBy());
         return rawMaterialStockRepo.save(rawMaterialStock);
     }
