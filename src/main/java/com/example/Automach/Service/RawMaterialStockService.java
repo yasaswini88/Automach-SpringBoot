@@ -38,6 +38,7 @@ public class RawMaterialStockService {
         return rawMaterialStockRepo.save(rawMaterialStock);
     }
 
+
     public void deleteRawMaterialStock(Long id) {
         rawMaterialStockRepo.deleteById(id);
     }

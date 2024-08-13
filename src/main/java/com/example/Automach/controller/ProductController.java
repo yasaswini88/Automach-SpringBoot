@@ -18,8 +18,8 @@ import jakarta.transaction.Transactional;
 
 @RestController
 @CrossOrigin
-public class ProductController {
 
+public class ProductController {
     @Autowired
     ProductRepo prodRepo;
     @Autowired
