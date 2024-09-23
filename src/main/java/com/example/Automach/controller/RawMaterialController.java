@@ -22,6 +22,7 @@ public class RawMaterialController {
         return new ResponseEntity<>(rawMaterialRepo.save(rawMaterial), HttpStatus.CREATED);
     }
 
+
     @GetMapping("/rawmaterials")
     public ResponseEntity<List<RawMaterial>> getRawMaterials() {
         List<RawMaterial> rawMaterials = rawMaterialRepo.findAllRawMaterials();

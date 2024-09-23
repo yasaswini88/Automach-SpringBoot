@@ -1,8 +1,6 @@
 package com.example.Automach.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 import java.sql.Timestamp;
 
 @Entity
@@ -12,7 +10,6 @@ public class RawMaterialStock {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long raw_material_stock_id;
 
-//	@JsonIgnore
 	@OneToOne
 	@JoinColumn(name = "id", nullable = false)
 	private RawMaterial rawMaterial;
@@ -26,8 +23,10 @@ public class RawMaterialStock {
 	@JoinColumn(name = "user_id", nullable = false)
 	private Users modifiedBy;
 
-	// Getters and setters
+	// New field for minimum quantity
+	private int minQuantity;
 
+	// Getters and setters
 	public Long getRaw_material_stock_id() {
 		return raw_material_stock_id;
 	}
@@ -68,6 +67,14 @@ public class RawMaterialStock {
 		this.modifiedBy = modifiedBy;
 	}
 
+	public int getMinQuantity() {
+		return minQuantity;
+	}
+
+	public void setMinQuantity(int minQuantity) {
+		this.minQuantity = minQuantity;
+	}
+
 	@Override
 	public String toString() {
 		return "RawMaterialStock{" +
@@ -76,6 +83,7 @@ public class RawMaterialStock {
 				", quantity=" + quantity +
 				", dateModified=" + dateModified +
 				", modifiedBy=" + modifiedBy +
+				", minQuantity=" + minQuantity +
 				'}';
 	}
 

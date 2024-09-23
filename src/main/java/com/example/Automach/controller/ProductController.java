@@ -2,15 +2,14 @@ package com.example.Automach.controller;
 
 import java.util.*;
 
+import com.example.Automach.entity.*;
+import com.example.Automach.repo.TagRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.Automach.DTO.CreateProductRequest;
-import com.example.Automach.entity.Product;
-import com.example.Automach.entity.ProductRawMaterial;
-import com.example.Automach.entity.RawMaterial;
 import com.example.Automach.repo.ProductRepo;
 import com.example.Automach.repo.RawMaterialRepo;
 
@@ -18,16 +17,24 @@ import jakarta.transaction.Transactional;
 
 @RestController
 @CrossOrigin
-
 public class ProductController {
     @Autowired
     ProductRepo prodRepo;
     @Autowired
     RawMaterialRepo rawMaterialRepo;
+    @Autowired
+    TagRepo tagRepo;
 
     @PostMapping("/api/products")
     public ResponseEntity<Product> saveProduct(@RequestBody CreateProductRequest productRequest) {
-        return new ResponseEntity<>(addProductWithMaterials(productRequest.getProduct(), productRequest.getRawMaterialQuantities()), HttpStatus.CREATED);
+        System.out.println(productRequest.toString());
+        Product savedProduct = addProductWithMaterialsAndDetails(
+                productRequest.getProduct(),
+                productRequest.getRawMaterialQuantities(),
+                productRequest.getProduct().getCategory(),
+                productRequest.getProduct().getTags()
+        );
+        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
     @GetMapping("/api/products")
@@ -51,6 +58,7 @@ public class ProductController {
         if (product.isPresent()) {
             Product existingProduct = product.get();
             existingProduct.setProdName(productDetails.getProdName());
+            existingProduct.setPrice(productDetails.getPrice()); // Added the line to update price
             return new ResponseEntity<>(prodRepo.save(existingProduct), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -79,24 +87,21 @@ public class ProductController {
     }
 
     @Transactional
-    public Product addProductWithMaterials(Product product, Map<Long, Integer> rawMaterialQuantities) {
+    public Product addProductWithMaterialsAndDetails(Product product, Map<Long, Integer> rawMaterialQuantities, Category category, Set<Tag> tags) {
         Set<ProductRawMaterial> materials = new HashSet<>();
         for (Map.Entry<Long, Integer> entry : rawMaterialQuantities.entrySet()) {
             Long rawMaterialId = entry.getKey();
             Integer quantity = entry.getValue();
             RawMaterial rawMaterial = rawMaterialRepo.findById(rawMaterialId)
                     .orElseThrow(() -> new RuntimeException("Material not found with id: " + rawMaterialId));
-            
-            // Check if the ProductRawMaterial already exists
+
             Optional<ProductRawMaterial> existingMaterial = product.getRawMaterials().stream()
-                .filter(prm -> prm.getRawMaterial().getId().equals(rawMaterialId))
-                .findFirst();
+                    .filter(prm -> prm.getRawMaterial().getId().equals(rawMaterialId))
+                    .findFirst();
 
             if (existingMaterial.isPresent()) {
-                // Update the quantity if it already exists
                 existingMaterial.get().setRawMaterialQuantity(quantity);
             } else {
-                // Create new ProductRawMaterial if it doesn't exist
                 ProductRawMaterial productRawMaterial = new ProductRawMaterial();
                 productRawMaterial.setProduct(product);
                 productRawMaterial.setRawMaterial(rawMaterial);
@@ -105,7 +110,16 @@ public class ProductController {
             }
         }
         product.setRawMaterials(materials);
+
+        // Set category, tags, and price
+        product.setCategory(category);
+        Set<Tag> managedTags = new HashSet<>();
+        for (Tag tag : tags) {
+            Tag managedTag = tagRepo.findById(tag.getId()).orElse(tagRepo.save(tag));
+            managedTags.add(managedTag);
+        }
+        product.setTags(managedTags);
+
         return prodRepo.save(product);
     }
-
 }

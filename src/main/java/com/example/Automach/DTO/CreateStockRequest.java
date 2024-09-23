@@ -11,22 +11,23 @@ public class CreateStockRequest {
     private Timestamp dateModified;
     private Long modifiedByUserId;
     private Map<Long, Integer> rawMaterialQuantities;
+    private int minQuantity;
 
     // Default constructor
     public CreateStockRequest() {
     }
 
     // Parameterized constructor
-    public CreateStockRequest(Long rawMaterialId, int quantity, Timestamp dateModified, Long modifiedByUserId, Map<Long, Integer> rawMaterialQuantities) {
+    public CreateStockRequest(Long rawMaterialId, int quantity, Timestamp dateModified, Long modifiedByUserId, Map<Long, Integer> rawMaterialQuantities, int minQuantity) {
         this.rawMaterialId = rawMaterialId;
         this.quantity = quantity;
         this.dateModified = dateModified;
         this.modifiedByUserId = modifiedByUserId;
         this.rawMaterialQuantities = rawMaterialQuantities;
+        this.minQuantity = minQuantity;
     }
 
     // Getters and setters
-
     public Long getRawMaterialId() {
         return rawMaterialId;
     }
@@ -67,6 +68,14 @@ public class CreateStockRequest {
         this.rawMaterialQuantities = rawMaterialQuantities;
     }
 
+    public int getMinQuantity() {
+        return minQuantity;
+    }
+
+    public void setMinQuantity(int minQuantity) {
+        this.minQuantity = minQuantity;
+    }
+
     @Override
     public String toString() {
         return "CreateStockRequest{" +
@@ -75,6 +84,7 @@ public class CreateStockRequest {
                 ", dateModified=" + dateModified +
                 ", modifiedByUserId=" + modifiedByUserId +
                 ", rawMaterialQuantities=" + rawMaterialQuantities +
+                ", minQuantity=" + minQuantity +
                 '}';
     }
 
@@ -87,11 +97,12 @@ public class CreateStockRequest {
                 Objects.equals(rawMaterialId, that.rawMaterialId) &&
                 Objects.equals(dateModified, that.dateModified) &&
                 Objects.equals(modifiedByUserId, that.modifiedByUserId) &&
-                Objects.equals(rawMaterialQuantities, that.rawMaterialQuantities);
+                Objects.equals(rawMaterialQuantities, that.rawMaterialQuantities) &&
+                Objects.equals(minQuantity, that.minQuantity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(rawMaterialId, quantity, dateModified, modifiedByUserId, rawMaterialQuantities);
+        return Objects.hash(rawMaterialId, quantity, dateModified, modifiedByUserId, rawMaterialQuantities, minQuantity);
     }
 }

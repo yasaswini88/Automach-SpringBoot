@@ -20,7 +20,7 @@ public class ProductRawMaterial {
     @JoinColumn(name = "prod_id")
     private Product product;
 
-    @JsonIgnore
+//    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "material_id")
     private RawMaterial rawMaterial;

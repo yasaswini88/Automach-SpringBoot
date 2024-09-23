@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,7 +45,7 @@ public class RawMaterialStockController {
 
     // Create a new RawMaterialStock
     @PostMapping
-    public ResponseEntity<RawMaterialStock> createRawMaterialStock(@RequestBody CreateStockRequest createStockRequest) {
+    public ResponseEntity<String> createRawMaterialStock(@RequestBody CreateStockRequest createStockRequest) {
         // Validate user ID
         if (createStockRequest.getModifiedByUserId() == null) {
             throw new IllegalArgumentException("User ID must not be null");
@@ -53,7 +55,7 @@ public class RawMaterialStockController {
         Users modifiedBy = usersRepo.findById(createStockRequest.getModifiedByUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        RawMaterialStock savedStock = null;
+        StringBuilder alertMessages = new StringBuilder();
 
         // Loop through each raw material in the request
         for (Map.Entry<Long, Integer> entry : createStockRequest.getRawMaterialQuantities().entrySet()) {
@@ -72,25 +74,47 @@ public class RawMaterialStockController {
             rawMaterialStock.setQuantity(entry.getValue());
             rawMaterialStock.setDateModified(createStockRequest.getDateModified());
             rawMaterialStock.setModifiedBy(modifiedBy);
+            rawMaterialStock.setMinQuantity(createStockRequest.getMinQuantity());
 
             // Save the RawMaterialStock instance
-            savedStock = rawMaterialStockService.saveRawMaterialStock(rawMaterialStock);
+            RawMaterialStock savedStock = rawMaterialStockService.saveRawMaterialStock(rawMaterialStock);
+
+            // Check for low stock and add to alert messages
+            if (savedStock.getQuantity() < savedStock.getMinQuantity()) {
+                alertMessages.append("Low stock alert for ")
+                        .append(savedStock.getRawMaterial().getMaterialName())
+                        .append(": Current quantity is ")
+                        .append(savedStock.getQuantity())
+                        .append(", below minimum of ")
+                        .append(savedStock.getMinQuantity())
+                        .append(".\n");
+            }
         }
 
-        return ResponseEntity.ok(savedStock);
+        return ResponseEntity.ok(alertMessages.toString().isEmpty() ? "Stock created successfully" : alertMessages.toString());
     }
 
-    // Update a RawMaterialStock
+    // Update an existing RawMaterialStock
     @PutMapping("/{id}")
     public ResponseEntity<RawMaterialStock> updateRawMaterialStock(@PathVariable Long id, @RequestBody RawMaterialStock rawMaterialStockDetails) {
-        RawMaterialStock updatedRawMaterialStock = rawMaterialStockService.updateRawMaterialStock(id, rawMaterialStockDetails);
-        return ResponseEntity.ok(updatedRawMaterialStock);
-    }
+        RawMaterialStock existingRawMaterialStock = rawMaterialStockService.getRawMaterialStockById(id)
+                .orElseThrow(() -> new RuntimeException("RawMaterialStock not found"));
 
-    // Delete a RawMaterialStock
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRawMaterialStock(@PathVariable Long id) {
-        rawMaterialStockService.deleteRawMaterialStock(id);
-        return ResponseEntity.noContent().build();
+        existingRawMaterialStock.setQuantity(rawMaterialStockDetails.getQuantity());
+        existingRawMaterialStock.setMinQuantity(rawMaterialStockDetails.getMinQuantity());
+        existingRawMaterialStock.setDateModified(Timestamp.from(Instant.now()));
+        existingRawMaterialStock.setModifiedBy(rawMaterialStockDetails.getModifiedBy());
+
+        RawMaterialStock updatedRawMaterialStock = rawMaterialStockService.saveRawMaterialStock(existingRawMaterialStock);
+
+//        String alertMessage = "";
+//        if (updatedRawMaterialStock.getQuantity() < updatedRawMaterialStock.getMinQuantity()) {
+//            alertMessage = "Low stock alert: Current quantity is " +
+//                    updatedRawMaterialStock.getQuantity() + ", below minimum of " +
+//                    updatedRawMaterialStock.getMinQuantity() + ".";
+//        }
+
+//        return ResponseEntity.ok(alertMessage.isEmpty() ? "Stock updated successfully" : alertMessage);
+        return ResponseEntity.ok(updatedRawMaterialStock);
     }
 }
