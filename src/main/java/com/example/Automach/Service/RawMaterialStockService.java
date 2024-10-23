@@ -22,6 +22,10 @@ public class RawMaterialStockService {
         return rawMaterialStockRepository.findById(id);
     }
 
+    public Optional<RawMaterialStock> getRawMaterialStockByMaterialName(String materialName) {
+        return rawMaterialStockRepository.findByRawMaterialMaterialName(materialName);
+    }
+
     public RawMaterialStock saveRawMaterialStock(RawMaterialStock rawMaterialStock) {
         return rawMaterialStockRepository.save(rawMaterialStock);
     }

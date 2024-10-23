@@ -12,9 +12,11 @@ public class Inventory {
 
     private String sku;  // SKU, generated as "prodId + 5-digit counter"
 
-    private Integer quantity; // Total quantity of this product
+    private int quantity; // Total quantity of this product
+    private int blockedQuantity;
+    private int requiredQuantity;
 
-    private String status; // Product status like "Available", "Damaged", etc.
+//    private String status; // Product status like "Available", "Damaged", etc.
 
     @ManyToOne
     @JoinColumn(name = "prod_id", nullable = false)
@@ -30,7 +32,6 @@ public class Inventory {
     // SKU counter stored in DB to avoid duplication after restart
     private Integer skuCounter;
 
-    // Getters and Setters
     public Long getInventoryId() {
         return inventoryId;
     }
@@ -47,20 +48,28 @@ public class Inventory {
         this.sku = sku;
     }
 
-    public Integer getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public String getStatus() {
-        return status;
+    public int getBlockedQuantity() {
+        return blockedQuantity;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setBlockedQuantity(int blockedQuantity) {
+        this.blockedQuantity = blockedQuantity;
+    }
+
+    public int getRequiredQuantity() {
+        return requiredQuantity;
+    }
+
+    public void setRequiredQuantity(int requiredQuantity) {
+        this.requiredQuantity = requiredQuantity;
     }
 
     public Product getProduct() {
@@ -95,11 +104,12 @@ public class Inventory {
         this.skuCounter = skuCounter;
     }
 
-    public Inventory(Long inventoryId, String sku, Integer quantity, String status, Product product, Users userModified, Date modifiedDate, Integer skuCounter) {
+    public Inventory(Long inventoryId, String sku, int quantity, int blockedQuantity, int requiredQuantity, Product product, Users userModified, Date modifiedDate, Integer skuCounter) {
         this.inventoryId = inventoryId;
         this.sku = sku;
         this.quantity = quantity;
-        this.status = status;
+        this.blockedQuantity = blockedQuantity;
+        this.requiredQuantity = requiredQuantity;
         this.product = product;
         this.userModified = userModified;
         this.modifiedDate = modifiedDate;

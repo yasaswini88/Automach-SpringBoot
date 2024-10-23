@@ -6,6 +6,7 @@ import com.example.Automach.DTO.SupplierDTO;
 import com.example.Automach.Service.SupplierService;
 import com.example.Automach.entity.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,12 @@ public class SupplierController {
     @GetMapping("/{id}")
     public Optional<Supplier> getSupplierById(@PathVariable Long id) {
         return supplierService.getSupplierById(id);
+    }
+
+    @GetMapping("/supplierName/{name}")
+    public ResponseEntity<Supplier> getSupplierByName(@PathVariable String name) {
+        Optional<Supplier> supplier = supplierService.getSupplierByName(name.toLowerCase());
+        return supplier.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping

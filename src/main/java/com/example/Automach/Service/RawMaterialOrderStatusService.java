@@ -3,6 +3,7 @@ package com.example.Automach.Service;
 import com.example.Automach.DTO.RawMaterialOrderStatusDTO;
 import com.example.Automach.entity.RawMaterial;
 import com.example.Automach.entity.RawMaterialOrderStatus;
+import com.example.Automach.entity.RawMaterialStock;
 import com.example.Automach.entity.Users;
 import com.example.Automach.repo.RawMaterialOrderStatusRepo;
 import com.example.Automach.repo.RawMaterialRepo;
@@ -23,6 +24,9 @@ public class RawMaterialOrderStatusService {
 
     @Autowired
     private RawMaterialRepo rawMaterialRepository;
+
+    @Autowired
+    private RawMaterialStockService rawMaterialStockService;
 
     @Autowired
     private UserRepo usersRepository;
@@ -47,6 +51,27 @@ public class RawMaterialOrderStatusService {
         return mapToDTO(savedOrderStatus);
     }
 
+//    public RawMaterialOrderStatusDTO updateOrder(Long orderId, RawMaterialOrderStatusDTO dto) {
+//        Optional<RawMaterialOrderStatus> optionalOrderStatus = repository.findById(orderId);
+//        if (optionalOrderStatus.isPresent()) {
+//            RawMaterialOrderStatus orderStatus = optionalOrderStatus.get();
+//            RawMaterial rawMaterial = findRawMaterialById(dto.getRawMaterialId());
+//            orderStatus.setRawMaterial(rawMaterial);
+//            orderStatus.setRawMaterialQuantity(dto.getRawMaterialQuantity());
+//            orderStatus.setSupplierName(dto.getSupplierName());
+//            orderStatus.setStatus(dto.getStatus());
+//            orderStatus.setTrackingInfo(dto.getTrackingInfo());
+//            orderStatus.setNotes(dto.getNotes());
+//            orderStatus.setUpdatedBy(findUserById(dto.getUpdatedBy()));
+//            orderStatus.setUpdatedDate(dto.getUpdatedDate());
+//
+//            RawMaterialOrderStatus updatedOrderStatus = repository.save(orderStatus);
+//            return mapToDTO(updatedOrderStatus);
+//        } else {
+//            throw new RuntimeException("Order not found with ID: " + orderId);
+//        }
+//    }
+
     public RawMaterialOrderStatusDTO updateOrder(Long orderId, RawMaterialOrderStatusDTO dto) {
         Optional<RawMaterialOrderStatus> optionalOrderStatus = repository.findById(orderId);
         if (optionalOrderStatus.isPresent()) {
@@ -61,13 +86,21 @@ public class RawMaterialOrderStatusService {
             orderStatus.setUpdatedBy(findUserById(dto.getUpdatedBy()));
             orderStatus.setUpdatedDate(dto.getUpdatedDate());
 
+            // Check if the status is being updated to 'Delivered'
+            if ("Delivered".equals(dto.getStatus())) {
+                RawMaterialStock rawMaterialStock = rawMaterialStockService.getRawMaterialStockByMaterialName(rawMaterial.getMaterialName())
+                        .orElseThrow(() -> new RuntimeException("RawMaterialStock not found"));
+                // Increase the stock quantity
+                rawMaterialStock.setQuantity(rawMaterialStock.getQuantity() + dto.getRawMaterialQuantity());
+                rawMaterialStockService.saveRawMaterialStock(rawMaterialStock);
+            }
+
             RawMaterialOrderStatus updatedOrderStatus = repository.save(orderStatus);
             return mapToDTO(updatedOrderStatus);
         } else {
             throw new RuntimeException("Order not found with ID: " + orderId);
         }
     }
-
     public RawMaterialOrderStatusDTO getOrderById(Long orderId) {
         Optional<RawMaterialOrderStatus> optionalOrderStatus = repository.findById(orderId);
         if (optionalOrderStatus.isPresent()) {

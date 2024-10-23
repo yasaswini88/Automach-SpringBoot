@@ -52,6 +52,18 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/api/products/name/{prodName}")
+    public ResponseEntity<Product> getProductByName(@PathVariable String prodName) {
+        Optional<Product> product = prodRepo.findByProdNameIgnoreCase(prodName.toLowerCase());
+        if (product.isPresent()) {
+            return new ResponseEntity<>(product.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    
     @PutMapping("/api/products/{prodId}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long prodId, @RequestBody Product productDetails) {
         Optional<Product> product = prodRepo.findById(prodId);

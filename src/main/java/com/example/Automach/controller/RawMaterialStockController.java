@@ -43,6 +43,12 @@ public class RawMaterialStockController {
         return rawMaterialStock.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/material/{materialName}")
+    public ResponseEntity<RawMaterialStock> getRawMaterialStockByMaterialName(@PathVariable String materialName) {
+        Optional<RawMaterialStock> rawMaterialStock = rawMaterialStockService.getRawMaterialStockByMaterialName(materialName);
+        return rawMaterialStock.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     // Create a new RawMaterialStock
     @PostMapping
     public ResponseEntity<String> createRawMaterialStock(@RequestBody CreateStockRequest createStockRequest) {

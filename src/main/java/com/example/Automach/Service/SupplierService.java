@@ -21,6 +21,10 @@ public class SupplierService {
         return supplierRepository.findById(id);
     }
 
+    public Optional<Supplier> getSupplierByName(String name) {
+        return supplierRepository.findByNameIgnoreCase(name);
+    }
+
     public Supplier addSupplier(Supplier supplier) {
         return supplierRepository.save(supplier);
     }

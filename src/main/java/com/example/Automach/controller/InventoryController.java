@@ -22,39 +22,54 @@ public class InventoryController {
         return ResponseEntity.ok(result);
     }
 
-//    // Fetch inventory by ID
-//    @GetMapping("/{id}")
-//    public ResponseEntity<InventoryDTO> getInventoryById(@PathVariable Long id) {
-//        InventoryDTO result = inventoryService.getInventoryById(id);
-//        return ResponseEntity.ok(result);
-//    }
-//
-//    // Fetch inventory by product ID
-//    @GetMapping("/product/{productId}")
-//    public ResponseEntity<List<InventoryDTO>> getInventoryByProductId(@PathVariable Long productId) {
-//        List<InventoryDTO> result = inventoryService.getInventoryByProductId(productId);
-//        return ResponseEntity.ok(result);
-//    }
-//
-//    // Fetch inventory by SKU
-//    @GetMapping("/sku/{sku}")
-//    public ResponseEntity<InventoryDTO> getInventoryBySku(@PathVariable String sku) {
-//        InventoryDTO result = inventoryService.getInventoryBySku(sku);
-//        return ResponseEntity.ok(result);
-//    }
-//
-//    // Update status of inventory item
+    // Fetch all inventory items
+    @GetMapping("/")
+    public ResponseEntity<List<InventoryDTO>> getAllInventory() {
+        List<InventoryDTO> result = inventoryService.getAllInventory();
+        return ResponseEntity.ok(result);
+    }
+
+    // Fetch inventory by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<InventoryDTO> getInventoryById(@PathVariable Long id) {
+        InventoryDTO result = inventoryService.getInventoryById(id);
+        return ResponseEntity.ok(result);
+    }
+
+    // Fetch inventory by product ID
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<InventoryDTO>> getInventoryByProductId(@PathVariable Long productId) {
+        List<InventoryDTO> result = inventoryService.getInventoryByProductId(productId);
+        return ResponseEntity.ok(result);
+    }
+
+    // Fetch inventory by SKU
+    @GetMapping("/sku/{sku}")
+    public ResponseEntity<InventoryDTO> getInventoryBySku(@PathVariable String sku) {
+        InventoryDTO result = inventoryService.getInventoryBySku(sku);
+        return ResponseEntity.ok(result);
+    }
+
+    // Update status of inventory item
 //    @PutMapping("/{id}/status")
 //    public ResponseEntity<InventoryDTO> updateInventoryStatus(@PathVariable Long id, @RequestParam String status) {
 //        InventoryDTO result = inventoryService.updateInventoryStatus(id, status);
 //        return ResponseEntity.ok(result);
 //    }
-//
-//    // Delete inventory by ID
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteInventoryById(@PathVariable Long id) {
-//        inventoryService.deleteInventoryById(id);
-//        return ResponseEntity.noContent().build();
-//    }
-}
 
+    @PutMapping("/{id}/quantity")
+    public ResponseEntity<InventoryDTO> updateInventoryQuantity(@PathVariable Long id, @RequestBody InventoryDTO inventoryDTO) {
+        Integer newQuantity = inventoryDTO.getQuantity();
+        InventoryDTO result = inventoryService.updateInventoryQuantity(id, newQuantity);
+        return ResponseEntity.ok(result);
+    }
+
+
+
+    // Delete inventory by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInventoryById(@PathVariable Long id) {
+        inventoryService.deleteInventoryById(id);
+        return ResponseEntity.noContent().build();
+    }
+}

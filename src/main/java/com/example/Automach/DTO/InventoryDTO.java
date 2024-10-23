@@ -7,12 +7,14 @@ public class InventoryDTO {
     private Long inventoryId;
     private String sku;
     private Integer quantity;
-    private String status;
+    private Integer blockedQuantity;
+    private Integer requiredQuantity;
+//    private String status;
     private Long productId;
     private Long userId;
     private Date modifiedDate;
+    private Integer skuCounter;
 
-    // Getters and Setters
     public Long getInventoryId() {
         return inventoryId;
     }
@@ -37,12 +39,20 @@ public class InventoryDTO {
         this.quantity = quantity;
     }
 
-    public String getStatus() {
-        return status;
+    public Integer getBlockedQuantity() {
+        return blockedQuantity;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setBlockedQuantity(Integer blockedQuantity) {
+        this.blockedQuantity = blockedQuantity;
+    }
+
+    public Integer getRequiredQuantity() {
+        return requiredQuantity;
+    }
+
+    public void setRequiredQuantity(Integer requiredQuantity) {
+        this.requiredQuantity = requiredQuantity;
     }
 
     public Long getProductId() {
@@ -67,5 +77,13 @@ public class InventoryDTO {
 
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public Integer getSkuCounter() {
+        return skuCounter;
+    }
+
+    public void setSkuCounter(Integer skuCounter) {
+        this.skuCounter = skuCounter;
     }
 }

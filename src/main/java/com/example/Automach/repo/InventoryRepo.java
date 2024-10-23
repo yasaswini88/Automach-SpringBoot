@@ -10,11 +10,9 @@ import java.util.Optional;
 @Repository
 public interface InventoryRepo extends JpaRepository<Inventory, Long> {
 
-    // Custom method to find by productId and sort by SKU counter for SKU generation
     Inventory findTopByProductProdIdOrderBySkuCounterDesc(Long productId);
-    // Find by product ID
-    List<Inventory> findByProductProdId(Long productId);
 
-    // Find by SKU
+    Inventory findByProductProdId(Long productId);
+
     Optional<Inventory> findBySku(String sku);
 }
