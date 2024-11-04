@@ -34,15 +34,38 @@ public class RawMaterialOrderStatusController {
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
 
+//    @GetMapping
+//    public ResponseEntity<List<RawMaterialOrderStatusDTO>> getAllOrders() {
+//        List<RawMaterialOrderStatusDTO> orders = service.getAllOrders().stream().map(service::mapToDTO).toList();
+//        return new ResponseEntity<>(orders, HttpStatus.OK);
+//    }
+
     @GetMapping
-    public ResponseEntity<List<RawMaterialOrderStatusDTO>> getAllOrders() {
-        List<RawMaterialOrderStatusDTO> orders = service.getAllOrders().stream().map(service::mapToDTO).toList();
+    public ResponseEntity<List<RawMaterialOrderStatusDTO>> getOrdersByStatus(@RequestParam(value = "status", required = false) String status) {
+        List<RawMaterialOrderStatusDTO> orders;
+        if (status != null && !status.isEmpty()) {
+            orders = service.getOrdersByStatus(status).stream().map(service::mapToDTO).toList();
+        } else {
+            orders = service.getAllOrders().stream().map(service::mapToDTO).toList();
+        }
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
+
+    // get order status of raw materials based on suppliers
+    @GetMapping("/{rawMaterialName}/{supplierName}/status")
+    public ResponseEntity<List<RawMaterialOrderStatusDTO>> getOrderStatusByRawMaterialAndSupplier(
+            @PathVariable String rawMaterialName,
+            @PathVariable String supplierName) {
+        List<RawMaterialOrderStatusDTO> orders = service.getOrderStatusByRawMaterialAndSupplier(rawMaterialName, supplierName);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
 
     @DeleteMapping("/{orderId}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long orderId) {
         service.deleteOrder(orderId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+
 }

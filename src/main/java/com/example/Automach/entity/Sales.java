@@ -13,7 +13,7 @@ public class Sales {
 
     private String orderDecision; // For tracking if the order is quoted or confirmed
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}) // Remove CascadeType.REMOVE
     @JoinTable(
             name = "sales_products",
             joinColumns = @JoinColumn(name = "sale_id"),

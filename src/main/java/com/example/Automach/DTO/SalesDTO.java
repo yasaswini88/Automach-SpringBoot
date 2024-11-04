@@ -15,7 +15,7 @@ public class SalesDTO {
     private Long createdUserId;
     private Timestamp orderDeliveryDate;
 
-    // Getters and Setters
+// Getters and Setters
 
 
     public String getCustomerName() {

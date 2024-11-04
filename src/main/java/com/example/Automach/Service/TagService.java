@@ -17,10 +17,19 @@ public class TagService {
     public List<Tag> getAllTags() {
         return tagRepository.findAll();
     }
+//
+//    public Tag saveTag(Tag tag) {
+//        return tagRepository.save(tag);
+//    }
 
     public Tag saveTag(Tag tag) {
+        if (tag.getName() == null) {
+            throw new IllegalArgumentException("Tag name cannot be null");
+        }
+
         return tagRepository.save(tag);
     }
+
 
     public void deleteTag(Long id) {
         tagRepository.deleteById(id);

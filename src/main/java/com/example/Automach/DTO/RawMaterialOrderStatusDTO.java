@@ -7,9 +7,19 @@ public class RawMaterialOrderStatusDTO {
     private Long rawMaterialId;
     private String rawMaterialName;
     private int rawMaterialQuantity;
+    private Long supplierId;
     private String supplierName;
     private String status;
-    private String trackingInfo;
+
+    public Long getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Long supplierId) {
+        this.supplierId = supplierId;
+    }
+
+//    private String trackingInfo;
     private String notes;
     private Long createdBy;
     private Long updatedBy;
@@ -65,13 +75,13 @@ public class RawMaterialOrderStatusDTO {
         this.status = status;
     }
 
-    public String getTrackingInfo() {
-        return trackingInfo;
-    }
-
-    public void setTrackingInfo(String trackingInfo) {
-        this.trackingInfo = trackingInfo;
-    }
+//    public String getTrackingInfo() {
+//        return trackingInfo;
+//    }
+//
+//    public void setTrackingInfo(String trackingInfo) {
+//        this.trackingInfo = trackingInfo;
+//    }
 
     public String getNotes() {
         return notes;

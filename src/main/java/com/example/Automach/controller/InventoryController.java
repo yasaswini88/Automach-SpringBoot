@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000") // Allow cross-origin from your frontend (adjust URL if necessary)
 @RestController
 @RequestMapping("/api/inventory")
 public class InventoryController {
@@ -50,12 +51,22 @@ public class InventoryController {
         return ResponseEntity.ok(result);
     }
 
+    // Fetch the inventory Data by Product Name
+    @GetMapping("/product/{productName}/quantity")
+    public ResponseEntity<List<InventoryDTO>> getInventoryQuantityByProductName(@PathVariable String productName) {
+        List<InventoryDTO> result = inventoryService.getInventoryByProductName(productName);
+        return ResponseEntity.ok(result);
+    }
+
+
     // Update status of inventory item
 //    @PutMapping("/{id}/status")
 //    public ResponseEntity<InventoryDTO> updateInventoryStatus(@PathVariable Long id, @RequestParam String status) {
 //        InventoryDTO result = inventoryService.updateInventoryStatus(id, status);
 //        return ResponseEntity.ok(result);
 //    }
+
+
 
     @PutMapping("/{id}/quantity")
     public ResponseEntity<InventoryDTO> updateInventoryQuantity(@PathVariable Long id, @RequestBody InventoryDTO inventoryDTO) {
@@ -66,10 +77,11 @@ public class InventoryController {
 
 
 
+
     // Delete inventory by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteInventoryById(@PathVariable Long id) {
-        inventoryService.deleteInventoryById(id);
-        return ResponseEntity.noContent().build();
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteInventoryById(@PathVariable Long id) {
+//        inventoryService.deleteInventoryById(id);
+//        return ResponseEntity.noContent().build();
+//    }
 }

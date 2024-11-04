@@ -19,19 +19,7 @@ public class SalesController {
     @Autowired
     private SalesService salesService;
 
-    // POST mapping for creating a new sale
-//    @PostMapping
-//    public ResponseEntity<Sales> createSale(@RequestBody SalesDTO salesDTO) {
-//        Sales createdSale = salesService.createSale(salesDTO);
-//        return ResponseEntity.ok(createdSale);
-//    }
-//
-//    // PUT mapping for updating an existing sale
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Sales> updateSale(@PathVariable Long id, @RequestBody SalesUpdateDTO salesUpdateDTO) {
-//        Sales updatedSale = salesService.updateSale(id, salesUpdateDTO);
-//        return ResponseEntity.ok(updatedSale);
-//    }
+
 
     // POST mapping for creating a new sale
     @PostMapping
@@ -43,6 +31,7 @@ public class SalesController {
     // PUT mapping for updating an existing sale
     @PutMapping("/{id}")
     public ResponseEntity<Sales> updateSale(@PathVariable Long id, @RequestBody SalesUpdateDTO salesUpdateDTO) {
+//        System.out.println(salesUpdateDTO);
         Sales updatedSale = salesService.updateSale(id, salesUpdateDTO);
         return ResponseEntity.ok(updatedSale);
     }
@@ -66,6 +55,10 @@ public class SalesController {
         return ResponseEntity.ok(sale);
     }
 
+    @GetMapping("/{id}/ready-to-ship")
+    public ResponseEntity<Boolean> checkReadyToShip(@PathVariable Long id) {
+        return ResponseEntity.ok(salesService.checkReadyToShip(id));
+    }
 
     @GetMapping
     public ResponseEntity<List<Sales>> getAllSales() {

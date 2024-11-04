@@ -3,6 +3,8 @@ package com.example.Automach.repo;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.Automach.entity.Product;
+import com.example.Automach.entity.ProductRawMaterial;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,7 +17,10 @@ public interface RawMaterialRepo extends JpaRepository<RawMaterial, Long> {
 	
 
 	Optional<RawMaterial> findByMaterialName(String materialName);
-	
+
+//	List<ProductRawMaterial> findAllByProduct(Product product);
+
+
 }
 
 

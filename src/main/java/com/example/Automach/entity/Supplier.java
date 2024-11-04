@@ -1,9 +1,9 @@
 package com.example.Automach.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.Set;
+
 @Entity
 public class Supplier {
     @Id
@@ -13,6 +13,23 @@ public class Supplier {
     private String email;
     private String phone;
     private String addressLine1;
+
+    @ManyToMany
+    @JoinTable(
+            name = "supplier_raw_materials",
+            joinColumns = @JoinColumn(name = "supplier_id"),
+            inverseJoinColumns = @JoinColumn(name = "raw_material_id")
+    )
+    private Set<RawMaterial> rawMaterials;
+
+    // Getters and setters for rawMaterials
+    public Set<RawMaterial> getRawMaterials() {
+        return rawMaterials;
+    }
+
+    public void setRawMaterials(Set<RawMaterial> rawMaterials) {
+        this.rawMaterials = rawMaterials;
+    }
 
     public Supplier() {
         super();

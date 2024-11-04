@@ -18,7 +18,10 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     private String name;
+
+
     @JsonIgnore
     @ManyToMany(mappedBy = "tags")
     private Set<Product> products = new HashSet<>();

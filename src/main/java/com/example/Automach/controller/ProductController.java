@@ -3,15 +3,13 @@ package com.example.Automach.controller;
 import java.util.*;
 
 import com.example.Automach.entity.*;
-import com.example.Automach.repo.TagRepo;
+import com.example.Automach.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.Automach.DTO.CreateProductRequest;
-import com.example.Automach.repo.ProductRepo;
-import com.example.Automach.repo.RawMaterialRepo;
 
 import jakarta.transaction.Transactional;
 
@@ -24,6 +22,14 @@ public class ProductController {
     RawMaterialRepo rawMaterialRepo;
     @Autowired
     TagRepo tagRepo;
+    @Autowired
+    SalesRepo salesRepo;
+
+    @Autowired
+    ProductRawMaterialRepo productRawMaterialRepo;
+
+    @Autowired
+    InventoryRepo inventoryRepo;
 
     @PostMapping("/api/products")
     public ResponseEntity<Product> saveProduct(@RequestBody CreateProductRequest productRequest) {
@@ -87,16 +93,32 @@ public class ProductController {
         }
     }
 
+
     @DeleteMapping("/api/products/{prodId}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long prodId) {
-        Optional<Product> product = prodRepo.findById(prodId);
-        if (product.isPresent()) {
-            prodRepo.delete(product.get());
+        Optional<Product> productOptional = prodRepo.findById(prodId);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+
+            // Remove product from all sales entities
+            List<Sales> salesList = salesRepo.findAllByProductsContaining(product);
+            for (Sales sale : salesList) {
+                sale.getProducts().remove(product);
+                salesRepo.save(sale);  // Update the sales entity to remove the product reference
+            }
+
+            // Clear associations with tags
+            product.getTags().clear();
+            prodRepo.save(product);  // Save to update the join table
+
+            // Now delete the product itself
+            prodRepo.delete(product);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     @Transactional
     public Product addProductWithMaterialsAndDetails(Product product, Map<Long, Integer> rawMaterialQuantities, Category category, Set<Tag> tags) {
@@ -107,31 +129,25 @@ public class ProductController {
             RawMaterial rawMaterial = rawMaterialRepo.findById(rawMaterialId)
                     .orElseThrow(() -> new RuntimeException("Material not found with id: " + rawMaterialId));
 
-            Optional<ProductRawMaterial> existingMaterial = product.getRawMaterials().stream()
-                    .filter(prm -> prm.getRawMaterial().getId().equals(rawMaterialId))
-                    .findFirst();
-
-            if (existingMaterial.isPresent()) {
-                existingMaterial.get().setRawMaterialQuantity(quantity);
-            } else {
-                ProductRawMaterial productRawMaterial = new ProductRawMaterial();
-                productRawMaterial.setProduct(product);
-                productRawMaterial.setRawMaterial(rawMaterial);
-                productRawMaterial.setRawMaterialQuantity(quantity);
-                materials.add(productRawMaterial);
-            }
+            ProductRawMaterial productRawMaterial = new ProductRawMaterial();
+            productRawMaterial.setProduct(product);
+            productRawMaterial.setRawMaterial(rawMaterial);
+            productRawMaterial.setRawMaterialQuantity(quantity);
+            materials.add(productRawMaterial);
         }
         product.setRawMaterials(materials);
 
-        // Set category, tags, and price
+        // Set category and tags
         product.setCategory(category);
         Set<Tag> managedTags = new HashSet<>();
         for (Tag tag : tags) {
-            Tag managedTag = tagRepo.findById(tag.getId()).orElse(tagRepo.save(tag));
+            Tag managedTag = tagRepo.findById(tag.getId())
+                    .orElseThrow(() -> new RuntimeException("Tag not found with id: " + tag.getId()));
             managedTags.add(managedTag);
         }
         product.setTags(managedTags);
 
         return prodRepo.save(product);
     }
+
 }

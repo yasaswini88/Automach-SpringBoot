@@ -14,8 +14,8 @@ public class SalesUpdateDTO {
     private Timestamp orderDeliveryDate;
     private Long updatedUserId;
     private Timestamp updatedDate;
-
-    // Getters and Setters
+    private List<Integer> oldQuantities; // Add this field
+    private boolean orderDecisionChangedToConfirmed;
 
     public String getCustomerName() {
         return customerName;
@@ -87,5 +87,38 @@ public class SalesUpdateDTO {
 
     public void setUpdatedDate(Timestamp updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public List<Integer> getOldQuantities() {
+        return oldQuantities;
+    }
+
+    public void setOldQuantities(List<Integer> oldQuantities) {
+        this.oldQuantities = oldQuantities;
+    }
+
+    public boolean isOrderDecisionChangedToConfirmed() {
+        return orderDecisionChangedToConfirmed;
+    }
+
+    public void setOrderDecisionChangedToConfirmed(boolean orderDecisionChangedToConfirmed) {
+        this.orderDecisionChangedToConfirmed = orderDecisionChangedToConfirmed;
+    }
+
+    @Override
+    public String toString() {
+        return "SalesUpdateDTO{" +
+                "customerName='" + customerName + '\'' +
+                ", orderDecision='" + orderDecision + '\'' +
+                ", productIds=" + productIds +
+                ", quantities=" + quantities +
+                ", discountPercent=" + discountPercent +
+                ", orderStatus='" + orderStatus + '\'' +
+                ", orderDeliveryDate=" + orderDeliveryDate +
+                ", updatedUserId=" + updatedUserId +
+                ", updatedDate=" + updatedDate +
+                ", oldQuantities=" + oldQuantities +
+                ", orderDecisionChangedToConfirmed=" + orderDecisionChangedToConfirmed +
+                '}';
     }
 }

@@ -3,10 +3,8 @@ package com.example.Automach.Service;
 import com.example.Automach.DTO.RawMaterialCountDTO;
 import com.example.Automach.DTO.SalesDTO;
 import com.example.Automach.DTO.SalesUpdateDTO;
-import com.example.Automach.entity.RawMaterial;
-import com.example.Automach.entity.Sales;
-import com.example.Automach.entity.Product;
-import com.example.Automach.entity.Users;
+import com.example.Automach.entity.*;
+import com.example.Automach.repo.InventoryRepo;
 import com.example.Automach.repo.SalesRepo;
 import com.example.Automach.repo.ProductRepo;
 import com.example.Automach.repo.UserRepo;
@@ -34,6 +32,8 @@ public class SalesService {
 
     @Autowired
     private InventoryService inventoryService;
+    @Autowired
+    private InventoryRepo inventoryRepo;
 
     // Method to create a new sale
     public Sales createSale(SalesDTO salesDTO) {
@@ -52,8 +52,8 @@ public class SalesService {
         for (int i = 0; i < products.size(); i++) {
             totalPrice += products.get(i).getPrice() * salesDTO.getQuantities().get(i);
 
-            if (salesDTO.getOrderStatus().equalsIgnoreCase("confirmed")) {
-                inventoryService.updateBlockedQuantity(salesDTO.getProductIds().get(i), salesDTO.getQuantities().get(i));
+            if (salesDTO.getOrderDecision().equalsIgnoreCase("confirmed")) {
+                inventoryService.updateBlockedQuantityWithRequirement(salesDTO.getProductIds().get(i), salesDTO.getQuantities().get(i));
             }
 
 
@@ -81,8 +81,109 @@ public class SalesService {
 
 
     // Method to update an existing sale
+//    public Sales updateSale(Long saleId, SalesUpdateDTO salesUpdateDTO) {
+//        Sales existingSale = salesRepo.findById(saleId).orElseThrow(() -> new RuntimeException("Sale not found"));
+//
+//        existingSale.setCustomerName(salesUpdateDTO.getCustomerName());
+//        existingSale.setOrderDecision(salesUpdateDTO.getOrderDecision());
+//
+//        // Retrieve and update products
+//        List<Product> products = productRepo.findAllById(salesUpdateDTO.getProductIds());
+//        existingSale.setProducts(products);
+//        existingSale.setQuantities(salesUpdateDTO.getQuantities());
+//
+//        // Recalculate total price
+//        Double totalPrice = 0.0;
+//        for (int i = 0; i < products.size(); i++) {
+//            totalPrice += products.get(i).getPrice() * salesUpdateDTO.getQuantities().get(i);
+//
+//            if (salesUpdateDTO.getOrderStatus().equalsIgnoreCase("delivered")) {
+//                inventoryService.releaseBlockedQuantity(salesUpdateDTO.getProductIds().get(i), salesUpdateDTO.getQuantities().get(i));
+//            }
+//        }
+//        existingSale.setTotalPrice(totalPrice);
+//
+//        // Recalculate final price with discount
+//        Double discount = salesUpdateDTO.getDiscountPercent();
+//        existingSale.setDiscountPercent(discount);
+//
+//        Double finalPrice = totalPrice - (totalPrice * discount / 100);
+//        existingSale.setFinalPrice(finalPrice);
+//
+//        existingSale.setOrderStatus(salesUpdateDTO.getOrderStatus());
+//        existingSale.setOrderDeliveryDate(salesUpdateDTO.getOrderDeliveryDate());
+//
+//        // Release blocked quantities if the order is delivered
+//        if ("Delivered".equals(salesUpdateDTO.getOrderStatus())) {
+//            for (int i = 0; i < products.size(); i++) {
+//                inventoryService.releaseBlockedQuantity(products.get(i).getProdId(), salesUpdateDTO.getQuantities().get(i));
+//            }
+//        }
+//
+//        // Retrieve the user who updated the sale
+//        Users updatedBy = userRepo.findById(salesUpdateDTO.getUpdatedUserId()).orElse(null);
+//        existingSale.setUpdatedBy(updatedBy);
+//        existingSale.setUpdatedDate(salesUpdateDTO.getUpdatedDate());
+//
+//        // Save and return the updated sale entity
+//        return salesRepo.save(existingSale);
+//    }
+    public boolean checkReadyToShip(Long saleId) {
+        Sales existingSale = salesRepo.findById(saleId).orElseThrow(() -> new RuntimeException("Sale not found"));
+
+        boolean readyToShip = true;
+
+        if (existingSale != null) {
+            for (int i = 0; i < existingSale.getProducts().size(); i++) {
+                Inventory inventory = inventoryRepo.findByProductProdId(existingSale.getProducts().get(i).getProdId());
+
+                int saleQuantity = existingSale.getQuantities().get(i);
+
+                if (inventory.getBlockedQuantity() < saleQuantity) {
+                    return false;
+                }
+            }
+        }
+
+        return readyToShip;
+    }
+
+    // Method to update an existing sale
     public Sales updateSale(Long saleId, SalesUpdateDTO salesUpdateDTO) {
         Sales existingSale = salesRepo.findById(saleId).orElseThrow(() -> new RuntimeException("Sale not found"));
+
+        System.out.println("Existing Order Decision: " + existingSale.getOrderDecision());
+        System.out.println("New Order Decision: " + salesUpdateDTO.getOrderDecision());
+        System.out.println("Order Decision Changed to Confirmed: " + salesUpdateDTO.isOrderDecisionChangedToConfirmed());
+
+        // Condition 1: If initially created with "Confirmed" OR
+        // Condition 2: If `orderDecision` changes from "Quoted" to "Confirmed"
+        boolean shouldUpdateInventory = "confirmed".equalsIgnoreCase(existingSale.getOrderDecision())
+                || salesUpdateDTO.isOrderDecisionChangedToConfirmed();
+
+        if (shouldUpdateInventory) {
+            // Update inventory for confirmed orders similar to after creating a new order
+            for (int i = 0; i < salesUpdateDTO.getProductIds().size(); i++) {
+                Long productId = salesUpdateDTO.getProductIds().get(i);
+                int newQuantity = salesUpdateDTO.getQuantities().get(i);
+                int oldQuantity = salesUpdateDTO.getOldQuantities().get(i);
+                boolean shouldUpdate = salesUpdateDTO.isOrderDecisionChangedToConfirmed() || ("confirmed".equalsIgnoreCase(existingSale.getOrderDecision()) && newQuantity != oldQuantity);
+                if (shouldUpdate) {
+                    int oldValue = ("confirmed".equalsIgnoreCase(existingSale.getOrderDecision()) && newQuantity != oldQuantity) ? oldQuantity : 0;
+                    inventoryService.updateInventoryQuantities(productId, oldValue, newQuantity);
+                }
+            }
+        }
+
+        boolean shouldReleaseInventory = !existingSale.getOrderStatus().equalsIgnoreCase(salesUpdateDTO.getOrderStatus()) && "shipped".equalsIgnoreCase(salesUpdateDTO.getOrderStatus());
+
+        if (shouldReleaseInventory) {
+            for (int i = 0; i < salesUpdateDTO.getProductIds().size(); i++) {
+                Long productId = salesUpdateDTO.getProductIds().get(i);
+                int quantity = salesUpdateDTO.getQuantities().get(i);
+                inventoryService.releaseInventoryQuantities(productId, quantity);
+            }
+        }
 
         existingSale.setCustomerName(salesUpdateDTO.getCustomerName());
         existingSale.setOrderDecision(salesUpdateDTO.getOrderDecision());
@@ -97,9 +198,9 @@ public class SalesService {
         for (int i = 0; i < products.size(); i++) {
             totalPrice += products.get(i).getPrice() * salesUpdateDTO.getQuantities().get(i);
 
-            if (salesUpdateDTO.getOrderStatus().equalsIgnoreCase("delivered")) {
-                inventoryService.releaseBlockedQuantity(salesUpdateDTO.getProductIds().get(i), salesUpdateDTO.getQuantities().get(i));
-            }
+//            if (salesUpdateDTO.getOrderStatus().equalsIgnoreCase("delivered")) {
+//                inventoryService.releaseBlockedQuantity(salesUpdateDTO.getProductIds().get(i), salesUpdateDTO.getQuantities().get(i));
+//            }
         }
         existingSale.setTotalPrice(totalPrice);
 
@@ -114,11 +215,11 @@ public class SalesService {
         existingSale.setOrderDeliveryDate(salesUpdateDTO.getOrderDeliveryDate());
 
         // Release blocked quantities if the order is delivered
-        if ("Delivered".equals(salesUpdateDTO.getOrderStatus())) {
-            for (int i = 0; i < products.size(); i++) {
-                inventoryService.releaseBlockedQuantity(products.get(i).getProdId(), salesUpdateDTO.getQuantities().get(i));
-            }
-        }
+//        if ("Delivered".equalsIgnoreCase(salesUpdateDTO.getOrderStatus())) {
+//            for (int i = 0; i < products.size(); i++) {
+//                inventoryService.releaseBlockedQuantity(products.get(i).getProdId(), salesUpdateDTO.getQuantities().get(i));
+//            }
+//        }
 
         // Retrieve the user who updated the sale
         Users updatedBy = userRepo.findById(salesUpdateDTO.getUpdatedUserId()).orElse(null);
@@ -129,13 +230,23 @@ public class SalesService {
         return salesRepo.save(existingSale);
     }
 
+
     public List<Sales> getAllSales() {
         return salesRepo.findAll();
     }
 
-    public void deleteSale(Long saleId) {
-        salesRepo.deleteById(saleId);
-    }
+
+@Transactional
+public void deleteSale(Long saleId) {
+    Sales sale = salesRepo.findById(saleId).orElseThrow(() -> new RuntimeException("Sale not found"));
+
+    // Remove associations with products without deleting the products
+    sale.getProducts().clear();
+    salesRepo.save(sale);
+
+    // Now delete the sale
+    salesRepo.deleteById(saleId);
+}
 
     public List<Product> getMostOrderedProducts() {
         List<Sales> allSales = salesRepo.findAll();

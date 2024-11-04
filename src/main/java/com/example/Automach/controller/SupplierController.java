@@ -24,6 +24,11 @@ public class SupplierController {
         return supplierService.getAllSuppliers();
     }
 
+    @GetMapping("/by-raw-material/{id}")
+    public List<Supplier> getSupplierByRawMaterial(@PathVariable Long id) {
+        return supplierService.findSuppliersByRawMaterial(id);
+    }
+
     @GetMapping("/{id}")
     public Optional<Supplier> getSupplierById(@PathVariable Long id) {
         return supplierService.getSupplierById(id);
@@ -46,7 +51,11 @@ public class SupplierController {
         supplier.setCity(supplierDTO.getCity());
         supplier.setState(supplierDTO.getState());
         supplier.setPostalCode(supplierDTO.getPostalCode());
-        return supplierService.addSupplier(supplier);
+        // Save supplier first to get its ID
+        Supplier savedSupplier = supplierService.addSupplier(supplier);
+
+        // Then assign raw materials
+        return supplierService.addRawMaterialsToSupplier(savedSupplier.getId(), supplierDTO.getRawMaterialIds());
     }
 
     @PutMapping("/{id}")

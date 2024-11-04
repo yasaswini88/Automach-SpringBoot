@@ -19,13 +19,21 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "product_tag",
-            joinColumns = @JoinColumn(name = "prod_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags = new HashSet<>();
+//    @ManyToMany(cascade = CascadeType.ALL)
+//    @JoinTable(
+//            name = "product_tag",
+//            joinColumns = @JoinColumn(name = "prod_id"),
+//            inverseJoinColumns = @JoinColumn(name = "tag_id")
+//    )
+//@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+
+@JoinTable(
+        name = "product_tag",
+        joinColumns = @JoinColumn(name = "prod_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+)
+private Set<Tag> tags = new HashSet<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductRawMaterial> rawMaterials = new HashSet<>();
@@ -79,8 +87,17 @@ public class Product {
         this.rawMaterials = rawMaterials;
     }
 
+//    @Override
+//    public String toString() {
+//        return "Product [prodId=" + prodId + ", prodName=" + prodName + ", price=" + price + ", category=" + category + ", tags=" + tags + ", rawMaterials=" + rawMaterials + "]";
+//    }
+
     @Override
     public String toString() {
-        return "Product [prodId=" + prodId + ", prodName=" + prodName + ", price=" + price + ", category=" + category + ", tags=" + tags + ", rawMaterials=" + rawMaterials + "]";
+        return "Product [prodId=" + prodId +
+                ", prodName=" + prodName +
+                ", price=" + price +
+                ", categoryId=" + (category != null ? category.getId() : "null") + "]";
     }
+
 }

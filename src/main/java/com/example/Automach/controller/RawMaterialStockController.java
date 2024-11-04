@@ -113,14 +113,7 @@ public class RawMaterialStockController {
 
         RawMaterialStock updatedRawMaterialStock = rawMaterialStockService.saveRawMaterialStock(existingRawMaterialStock);
 
-//        String alertMessage = "";
-//        if (updatedRawMaterialStock.getQuantity() < updatedRawMaterialStock.getMinQuantity()) {
-//            alertMessage = "Low stock alert: Current quantity is " +
-//                    updatedRawMaterialStock.getQuantity() + ", below minimum of " +
-//                    updatedRawMaterialStock.getMinQuantity() + ".";
-//        }
 
-//        return ResponseEntity.ok(alertMessage.isEmpty() ? "Stock updated successfully" : alertMessage);
         return ResponseEntity.ok(updatedRawMaterialStock);
     }
 }

@@ -19,7 +19,7 @@ public class RawMaterialOrderStatus {
 
     private String supplierName;
     private String status;
-    private String trackingInfo;
+
     private String notes;
 
     @ManyToOne
@@ -43,7 +43,7 @@ public class RawMaterialOrderStatus {
         this.rawMaterialQuantity = rawMaterialQuantity;
         this.supplierName = supplierName;
         this.status = status;
-        this.trackingInfo = trackingInfo;
+//        this.trackingInfo = trackingInfo;
         this.notes = notes;
         this.createdBy = createdBy;
         this.updatedBy = updatedBy;
@@ -59,7 +59,7 @@ public class RawMaterialOrderStatus {
                 ", rawMaterialQuantity=" + rawMaterialQuantity +
                 ", supplierName='" + supplierName + '\'' +
                 ", status='" + status + '\'' +
-                ", trackingInfo='" + trackingInfo + '\'' +
+//                ", trackingInfo='" + trackingInfo + '\'' +
                 ", notes='" + notes + '\'' +
                 ", createdBy=" + createdBy +
                 ", updatedBy=" + updatedBy +
@@ -104,13 +104,13 @@ public class RawMaterialOrderStatus {
         this.status = status;
     }
 
-    public String getTrackingInfo() {
-        return trackingInfo;
-    }
-
-    public void setTrackingInfo(String trackingInfo) {
-        this.trackingInfo = trackingInfo;
-    }
+//    public String getTrackingInfo() {
+//        return trackingInfo;
+//    }
+//
+//    public void setTrackingInfo(String trackingInfo) {
+//        this.trackingInfo = trackingInfo;
+//    }
 
     public String getNotes() {
         return notes;
