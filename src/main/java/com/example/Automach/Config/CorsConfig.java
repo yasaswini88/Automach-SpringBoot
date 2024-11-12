@@ -15,6 +15,7 @@ public class CorsConfig {
         config.setAllowCredentials(true);
         config.addAllowedOrigin("https://kite-sunny-molly.ngrok-free.app"); // Allow only this origin
         config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("http://3.80.149.107:3000");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
